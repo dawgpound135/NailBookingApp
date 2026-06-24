@@ -15,19 +15,31 @@ public class GoogleCalendarService
         _configuration = configuration;
     }
 
-    public async Task<string> CreateBookingEventAsync(BookingRequest booking)
+    private CalendarService CreateCalendarService()
     {
-        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var serviceAccountJson = Environment.GetEnvironmentVariable("GOOGLE_SERVICE_ACCOUNT_JSON");
+
+        if (string.IsNullOrWhiteSpace(serviceAccountJson))
+        {
+            throw new Exception("Google service account JSON is missing from environment variables.");
+        }
 
         var credential = GoogleCredential
-            .FromFile("hottiebox-nail-appointments-c8657048ac9e.json")
+            .FromJson(serviceAccountJson)
             .CreateScoped(CalendarService.Scope.Calendar);
 
-        var service = new CalendarService(new BaseClientService.Initializer
+        return new CalendarService(new BaseClientService.Initializer
         {
             HttpClientInitializer = credential,
             ApplicationName = "Nail Booking App"
         });
+    }
+
+    public async Task<string> CreateBookingEventAsync(BookingRequest booking)
+    {
+        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+
+        var service = CreateCalendarService();
 
         var duration = GetServiceDuration(booking.Service);
 
@@ -74,15 +86,7 @@ public class GoogleCalendarService
     {
     var calendarId = _configuration["GoogleCalendar:CalendarId"];
 
-    var credential = GoogleCredential
-        .FromFile("hottiebox-nail-appointments-c8657048ac9e.json")
-        .CreateScoped(CalendarService.Scope.Calendar);
-
-    var service = new CalendarService(new BaseClientService.Initializer
-    {
-        HttpClientInitializer = credential,
-        ApplicationName = "Nail Booking App"
-    });
+    var service = CreateCalendarService();
 
     var duration = GetServiceDuration(booking.Service);
 
