@@ -80,6 +80,7 @@ public class GoogleCalendarService
     private int GetServiceDuration(string service)
     {
         return 150;
+        // comment 
     }
 
     public async Task<bool> IsSlotAvailableAsync(BookingRequest booking)
