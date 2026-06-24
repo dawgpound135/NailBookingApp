@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+artifacts/
+
+# IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets and credentials
+hottiebox-nail-appointments-c8657048ac9e.json
+secrets.json
+appsettings.Local.json
+appsettings.*.Local.json
+.env
+.env.*
+
+# Logs and temporary files
+*.log
+*.tmp
+TestResults/
+
+# Operating-system files
+.DS_Store
+Thumbs.db

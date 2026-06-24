@@ -1,0 +1,227 @@
+﻿@page
+@model NailBookingApp.Pages.BookModel
+
+    <div class="mx-auto" style="max-width: 520px;">
+
+        <div class="card shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+                    <h1 class="h3 mb-2">Book a Nail Appointment 💅</h1>
+                    <p class="text-muted mb-0">Fill in your details below</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger">
+                        @Model.ErrorMessage
+                    </div>
+                }
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input asp-for="Booking.Name" class="form-control form-control-lg" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input asp-for="Booking.PhoneNumber" class="form-control form-control-lg" type="tel" inputmode="numeric" maxlength="10" pattern="[0-9]{1,10}" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Service</label>
+                        <div class="btn-group w-100 mb-2" role="group">
+                            <input type="radio" class="btn-check" name="serviceType" id="maniBtn" value="mani" autocomplete="off" checked>
+                            <label class="btn btn-outline-dark btn-lg" for="maniBtn">Mani</label>
+                            <input type="radio" class="btn-check" name="serviceType" id="pediBtn" value="pedi" autocomplete="off">
+                            <label class="btn btn-outline-dark btn-lg" for="pediBtn">Pedi</label>
+                            <input type="radio" class="btn-check" name="serviceType" id="makeUpBtn" value="makeup" autocomplete="off">
+                            <label class="btn btn-outline-dark btn-lg" for="makeUpBtn">Make Up</label>
+                        </div>
+
+                        <input type="hidden" asp-for="Booking.Service" id="finalService" />
+
+                        <select id="serviceSelect" class="form-select form-select-lg">
+                            <option value="">Select a service</option>
+                            <option class="mani-option">Rubber Base Structure Manicure - R230</option>
+                            <option class="mani-option">GEL X w/Rubber Base Overlay - R300</option>
+                            <option class="mani-option">Structure Manicure Infill - R200</option>
+                            <option class="mani-option">GEL X Infill - R250</option>
+                            <option class="mani-option">Soak-Off - R80</option>
+                            <option class="mani-option">Soak-Off (Not my work) - R100</option>
+                            <option class="mani-option">Broken Nail Fix - R30</option>
+                            <option class="pedi-option" style="display:none">Rubber Base Structure Pedicure - R330</option>
+                            <option class="pedi-option" style="display:none">Soak-off - R80</option>
+                            <option class="pedi-option" style="display:none">Soak-Off (Not my work) - R100</option>
+                            <option class="makeup-option" style="display:none">Soft Glam - R300</option>
+                            <option class="makeup-option" style="display:none">Full Glam - R400</option>
+                            <option class="makeup-option" style="display:none">Strip Lash add-on - R100</option>
+                            <option class="makeup-option" style="display:none">Soft Glam Trial - R220</option>
+                            <option class="makeup-option" style="display:none">Full Glam Trial - R300</option>
+                        </select>
+
+                        <div id="artAddon" class="mt-2">
+                            <label class="form-label mb-2">Add Nail Art</label>
+                            <div class="form-check">
+                                <input class="form-check-input art-level-option" type="radio" name="artLevel" id="artLevel1" value="Level 1: Simple (+R5)">
+                                <label class="form-check-label" for="artLevel1">Level 1: Simple (+R5 per finger)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input art-level-option" type="radio" name="artLevel" id="artLevel2" value="Level 2: Intermediate (+R10)">
+                                <label class="form-check-label" for="artLevel2">Level 2: Intermediate (+R10 per finger)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input art-level-option" type="radio" name="artLevel" id="artLevel3" value="Level 3: Advanced (+R15)">
+                                <label class="form-check-label" for="artLevel3">Level 3: Advanced (+R15 per finger)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        (function () {
+                            var groups = { mani: '.mani-option', pedi: '.pedi-option', makeup: '.makeup-option' };
+                            var artInputs = document.querySelectorAll('input[name="artLevel"]');
+                            var phoneNumberInput = document.getElementById('Booking_PhoneNumber');
+
+                            phoneNumberInput.addEventListener('input', function () {
+                                phoneNumberInput.value = phoneNumberInput.value.replace(/[^0-9]/g, '').slice(0, 10);
+                            });
+
+                            function clearArtSelection() {
+                                artInputs.forEach(function (option) {
+                                    option.checked = false;
+                                });
+                            }
+
+                            function updateServices(resetSelections) {
+                                var select = document.getElementById('serviceSelect');
+                                var active = document.querySelector('input[name="serviceType"]:checked').value;
+                                if (resetSelections) {
+                                    select.value = '';
+                                    clearArtSelection();
+                                }
+                                Object.keys(groups).forEach(function (key) {
+                                    var show = key === active;
+                                    select.querySelectorAll(groups[key]).forEach(function (o) {
+                                        o.style.display = show ? '' : 'none';
+                                        o.disabled = !show;
+                                    });
+                                });
+                                if (active === 'makeup') {
+                                    clearArtSelection();
+                                }
+                                document.getElementById('artAddon').style.display = active === 'makeup' ? 'none' : '';
+                                syncFinalService();
+                            }
+
+                            function restoreSelections() {
+                                var finalService = document.getElementById('finalService').value;
+                                if (!finalService) {
+                                    updateServices(false);
+                                    return;
+                                }
+
+                                var baseService = finalService;
+                                var selectedArt = null;
+
+                                artInputs.forEach(function (option) {
+                                    var suffix = ' + ' + option.value;
+                                    if (finalService.endsWith(suffix)) {
+                                        baseService = finalService.slice(0, -suffix.length);
+                                        selectedArt = option;
+                                    }
+                                });
+
+                                var matchingOption = Array.from(document.querySelectorAll('#serviceSelect option')).find(function (option) {
+                                    return option.value === baseService || option.text === baseService;
+                                });
+
+                                if (matchingOption) {
+                                    if (matchingOption.classList.contains('pedi-option')) {
+                                        document.getElementById('pediBtn').checked = true;
+                                    } else if (matchingOption.classList.contains('makeup-option')) {
+                                        document.getElementById('makeUpBtn').checked = true;
+                                    } else {
+                                        document.getElementById('maniBtn').checked = true;
+                                    }
+
+                                    updateServices(false);
+                                    document.getElementById('serviceSelect').value = matchingOption.value || matchingOption.text;
+
+                                    if (selectedArt && document.getElementById('makeUpBtn').checked === false) {
+                                        selectedArt.checked = true;
+                                    }
+                                } else {
+                                    updateServices(false);
+                                }
+
+                                syncFinalService();
+                            }
+
+                            function syncFinalService() {
+                                var base = document.getElementById('serviceSelect').value;
+                                var selectedArt = document.querySelector('input[name="artLevel"]:checked');
+                                var artLabel = selectedArt ? selectedArt.value : '';
+                                document.getElementById('finalService').value = base !== '' && artLabel !== ''
+                                    ? base + ' + ' + artLabel
+                                    : base;
+                            }
+
+                            document.getElementById('maniBtn').addEventListener('change', function () { updateServices(true); });
+                            document.getElementById('pediBtn').addEventListener('change', function () { updateServices(true); });
+                            document.getElementById('makeUpBtn').addEventListener('change', function () { updateServices(true); });
+                            document.getElementById('serviceSelect').addEventListener('change', syncFinalService);
+                            artInputs.forEach(function (option) {
+                                option.addEventListener('change', syncFinalService);
+                            });
+
+                            restoreSelections();
+                        })();
+                    </script>
+
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input asp-for="Booking.AppointmentDate" type="date" min="@Model.MinimumBookingDate.ToString("yyyy-MM-dd")" class="form-control form-control-lg" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Time</label>
+
+                        @if (Model.AvailableTimeSlots.Any())
+                        {
+                            <select asp-for="Booking.AppointmentTime" class="form-select form-select-lg">
+                                <option value="">Select an available time</option>
+
+                        @foreach (var time in Model.AvailableTimeSlots)
+                        {
+                            <option value="@time">@time</option>
+                        }
+                        </select>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                Select a service and date, then check available times.
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Nail inspo / notes</label>
+                        <textarea asp-for="Booking.Notes" class="form-control form-control-lg" rows="4"></textarea>
+                    </div>
+
+                    <button type="submit" name="checkAvailability" value="true" class="btn btn-outline-dark btn-lg w-100 mb-3">
+                        Check Available Times
+                    </button>
+
+                    <button type="submit" class="btn btn-dark btn-lg w-100">
+                        Book Appointment
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
