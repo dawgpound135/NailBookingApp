@@ -169,6 +169,16 @@
                                     : base;
                             }
 
+                            var bookingForm = document.querySelector('form');
+                            var checkAvailabilityButton = document.querySelector('button[name="checkAvailability"]');
+
+                            if (bookingForm && checkAvailabilityButton) {
+                                checkAvailabilityButton.addEventListener('click', function () {
+                                    checkAvailabilityButton.innerText = 'Checking times...';
+                                    checkAvailabilityButton.classList.add('disabled');
+                                });
+                            }
+
                             document.getElementById('maniBtn').addEventListener('change', function () { updateServices(true); });
                             document.getElementById('pediBtn').addEventListener('change', function () { updateServices(true); });
                             document.getElementById('makeUpBtn').addEventListener('change', function () { updateServices(true); });

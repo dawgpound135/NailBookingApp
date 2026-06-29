@@ -9,6 +9,7 @@ namespace NailBookingApp.Services;
 public class GoogleCalendarService
 {
     private readonly IConfiguration _configuration;
+    private static readonly TimeSpan SouthAfricaOffset = TimeSpan.FromHours(2);
 
     public GoogleCalendarService(IConfiguration configuration)
     {
@@ -85,57 +86,91 @@ public class GoogleCalendarService
 
     public async Task<bool> IsSlotAvailableAsync(BookingRequest booking)
     {
-    var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var calendarId = _configuration["GoogleCalendar:CalendarId"];
 
-    var service = CreateCalendarService();
+        var service = CreateCalendarService();
 
-    var duration = GetServiceDuration(booking.Service);
+        var duration = GetServiceDuration(booking.Service);
 
-    var timeParts = booking.AppointmentTime.Split(':');
-    var hour = int.Parse(timeParts[0]);
-    var minute = int.Parse(timeParts[1]);
+        var timeParts = booking.AppointmentTime.Split(':');
+        var hour = int.Parse(timeParts[0]);
+        var minute = int.Parse(timeParts[1]);
 
-    var startDateTime = booking.AppointmentDate.Date.AddHours(hour).AddMinutes(minute);
-    var endDateTime = startDateTime.AddMinutes(duration);
+        var startDateTime = booking.AppointmentDate.Date.AddHours(hour).AddMinutes(minute);
+        var endDateTime = startDateTime.AddMinutes(duration);
 
-    var request = service.Events.List(calendarId);
-    request.TimeMinDateTimeOffset = new DateTimeOffset(startDateTime, TimeSpan.FromHours(2));
-    request.TimeMaxDateTimeOffset = new DateTimeOffset(endDateTime, TimeSpan.FromHours(2));
-    request.SingleEvents = true;
-    request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
+        var request = service.Events.List(calendarId);
+        request.TimeMinDateTimeOffset = new DateTimeOffset(startDateTime, SouthAfricaOffset);
+        request.TimeMaxDateTimeOffset = new DateTimeOffset(endDateTime, SouthAfricaOffset);
+        request.SingleEvents = true;
+        request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
 
-    var events = await request.ExecuteAsync();
+        var events = await request.ExecuteAsync();
 
-    return events.Items == null || events.Items.Count == 0;
+        return events.Items == null || events.Items.Count == 0;
     }
 
     public async Task<List<string>> GetAvailableTimeSlotsAsync(DateTime date, string service)
     {
-    var allSlots = new List<string>
-    {
-        "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00", "16:00", "17:00"
-    };
-
-    var availableSlots = new List<string>();
-
-    foreach (var slot in allSlots)
-    {
-        var testBooking = new BookingRequest
+        var allSlots = new List<string>
         {
-            AppointmentDate = date,
-            AppointmentTime = slot,
-            Service = service
+            "09:00", "10:00", "11:00", "12:00",
+            "13:00", "14:00", "15:00", "16:00", "17:00"
         };
 
-        var isAvailable = await IsSlotAvailableAsync(testBooking);
+        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var calendarService = CreateCalendarService();
+        var serviceDuration = GetServiceDuration(service);
 
-        if (isAvailable)
-        {
-            availableSlots.Add(slot);
-        }
+        var dayStart = new DateTimeOffset(date.Date, SouthAfricaOffset);
+        var dayEnd = new DateTimeOffset(date.Date.AddDays(1), SouthAfricaOffset);
+
+        var request = calendarService.Events.List(calendarId);
+        request.TimeMinDateTimeOffset = dayStart;
+        request.TimeMaxDateTimeOffset = dayEnd;
+        request.SingleEvents = true;
+        request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
+
+        var events = await request.ExecuteAsync();
+        var bookedEvents = events.Items ?? new List<Event>();
+
+        return allSlots
+            .Where(slot => IsSlotAvailable(slot, date, serviceDuration, bookedEvents))
+            .ToList();
     }
 
-    return availableSlots;
+    private static bool IsSlotAvailable(string slot, DateTime date, int durationInMinutes, IList<Event> bookedEvents)
+    {
+        var timeParts = slot.Split(':');
+        var hour = int.Parse(timeParts[0]);
+        var minute = int.Parse(timeParts[1]);
+
+        var slotStart = new DateTimeOffset(date.Date.AddHours(hour).AddMinutes(minute), SouthAfricaOffset);
+        var slotEnd = slotStart.AddMinutes(durationInMinutes);
+
+        return !bookedEvents.Any(calendarEvent => EventOverlaps(calendarEvent, slotStart, slotEnd));
+    }
+
+    private static bool EventOverlaps(Event calendarEvent, DateTimeOffset slotStart, DateTimeOffset slotEnd)
+    {
+        var eventStart = calendarEvent.Start?.DateTimeDateTimeOffset;
+        var eventEnd = calendarEvent.End?.DateTimeDateTimeOffset;
+
+        if (!eventStart.HasValue && DateTime.TryParse(calendarEvent.Start?.Date, out var startDate))
+        {
+            eventStart = new DateTimeOffset(startDate, SouthAfricaOffset);
+        }
+
+        if (!eventEnd.HasValue && DateTime.TryParse(calendarEvent.End?.Date, out var endDate))
+        {
+            eventEnd = new DateTimeOffset(endDate, SouthAfricaOffset);
+        }
+
+        if (!eventStart.HasValue || !eventEnd.HasValue)
+        {
+            return false;
+        }
+
+        return eventStart.Value < slotEnd && eventEnd.Value > slotStart;
     }
 }
