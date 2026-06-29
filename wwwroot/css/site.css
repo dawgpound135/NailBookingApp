@@ -39,6 +39,13 @@ body {
   filter: drop-shadow(0 12px 22px rgba(79, 42, 58, 0.2));
 }
 
+.site-tagline {
+  color: #ff1493;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
 .page-book,
 .page-bookingconfirmed {
   min-height: 100vh;
