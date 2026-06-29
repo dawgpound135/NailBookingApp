@@ -1,23 +1,30 @@
 ﻿@page
 @model NailBookingApp.Pages.BookingConfirmedModel
 
-<h1>Booking Received 💅</h1>
-
-<p>Thank you! Your appointment request has been added.</p>
-
-@if (!string.IsNullOrWhiteSpace(Model.Service))
-{
-	<div class="card shadow-sm rounded-4 mt-4">
-		<div class="card-body p-4">
-			<h2 class="h5 mb-3">Booking Details</h2>
-			<p class="mb-2"><strong>Name:</strong> @Model.Name</p>
-			<p class="mb-2"><strong>Service:</strong> @Model.Service</p>
-			<p class="mb-2"><strong>Date:</strong> @Model.AppointmentDate</p>
-			<p class="mb-0"><strong>Time:</strong> @Model.AppointmentTime</p>
-		</div>
+<div class="salon-page-shell mx-auto">
+	<div class="salon-confirmation-hero text-center mb-4">
+		<div class="salon-confirmation-icon mb-3">💅</div>
+		<div class="salon-kicker mb-2">You’re on the list</div>
+		<h1 class="mb-2">Booking Received</h1>
+		<p class="text-muted mb-0">Thank you! Your appointment request has been added.</p>
 	</div>
-}
 
-<p>We’ll confirm your booking via WhatsApp shortly.</p>
+	@if (!string.IsNullOrWhiteSpace(Model.Service))
+	{
+		<div class="card salon-card shadow-sm rounded-4 mt-4">
+			<div class="card-body p-4">
+				<h2 class="h5 mb-3">Booking Details</h2>
+				<p class="mb-2"><strong>Name:</strong> @Model.Name</p>
+				<p class="mb-2"><strong>Service:</strong> @Model.Service</p>
+				<p class="mb-2"><strong>Date:</strong> @Model.AppointmentDate</p>
+				<p class="mb-0"><strong>Time:</strong> @Model.AppointmentTime</p>
+			</div>
+		</div>
+	}
 
-<a href="/Book">Make another booking</a>
+	<div class="salon-next-step text-center mt-4">
+		<p class="mb-3">We’ll confirm your booking via WhatsApp shortly.</p>
+
+		<a class="btn btn-dark salon-primary-btn btn-lg" href="/Book">Make another booking</a>
+	</div>
+</div>

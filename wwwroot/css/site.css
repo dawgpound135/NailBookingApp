@@ -20,3 +20,119 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.site-header {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(14px);
+}
+
+.page-book,
+.page-bookingconfirmed {
+  min-height: 100vh;
+  color: #35212a;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.9) 0 8%, transparent 22%),
+    radial-gradient(circle at 82% 12%, rgba(255, 198, 222, 0.65) 0 10%, transparent 25%),
+    radial-gradient(circle at 78% 78%, rgba(255, 232, 241, 0.85) 0 12%, transparent 28%),
+    linear-gradient(135deg, #fff7fb 0%, #ffd9e8 42%, #f8b9d2 100%);
+  background-attachment: fixed;
+}
+
+.page-book main,
+.page-bookingconfirmed main {
+  position: relative;
+}
+
+.page-book main::before,
+.page-bookingconfirmed main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.22) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.18) 25%, transparent 25%);
+  background-size: 34px 34px;
+  opacity: 0.35;
+}
+
+.salon-page-shell {
+  max-width: 560px;
+  position: relative;
+  z-index: 1;
+}
+
+.salon-card,
+.salon-confirmation-hero,
+.salon-next-step {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 60px rgba(151, 52, 95, 0.18);
+}
+
+.salon-confirmation-hero,
+.salon-next-step {
+  border-radius: 1.25rem;
+  padding: 2rem;
+}
+
+.salon-confirmation-icon {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffe8f1, #ffb7d0);
+  box-shadow: 0 16px 35px rgba(183, 62, 113, 0.22);
+  font-size: 2rem;
+}
+
+.salon-kicker {
+  color: #b83d75;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-book .form-control,
+.page-book .form-select {
+  border-color: #f0bfd2;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.page-book .form-control:focus,
+.page-book .form-select:focus {
+  border-color: #dc6e9e;
+  box-shadow: 0 0 0 0.25rem rgba(220, 110, 158, 0.22);
+}
+
+.page-book .btn-check:checked + .btn {
+  border-color: #c94d84;
+  background-color: #c94d84;
+  color: #fff;
+}
+
+.salon-primary-btn {
+  border-color: #3b1f2b;
+  background: linear-gradient(135deg, #3b1f2b, #b83d75);
+  box-shadow: 0 14px 28px rgba(184, 61, 117, 0.24);
+}
+
+.salon-primary-btn:hover {
+  border-color: #2e1721;
+  background: linear-gradient(135deg, #2e1721, #a63367);
+}
+
+.salon-outline-btn {
+  border-color: #b83d75;
+  color: #8f2f5d;
+}
+
+.salon-outline-btn:hover {
+  border-color: #b83d75;
+  background-color: #fff0f6;
+  color: #7f294f;
+}

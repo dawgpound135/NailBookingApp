@@ -1,12 +1,13 @@
 ﻿@page
 @model NailBookingApp.Pages.BookModel
 
-    <div class="mx-auto" style="max-width: 520px;">
+    <div class="salon-page-shell mx-auto">
 
-        <div class="card shadow-sm rounded-4">
+        <div class="card salon-card shadow-sm rounded-4">
             <div class="card-body p-4">
 
                 <div class="text-center mb-4">
+                    <div class="salon-kicker mb-2">HottieBox appointments</div>
                     <h1 class="h3 mb-2">Book a Nail Appointment 💅</h1>
                     <p class="text-muted mb-0">Fill in your details below</p>
                 </div>
@@ -212,11 +213,11 @@
                         <textarea asp-for="Booking.Notes" class="form-control form-control-lg" rows="4"></textarea>
                     </div>
 
-                    <button type="submit" name="checkAvailability" value="true" class="btn btn-outline-dark btn-lg w-100 mb-3">
+                    <button type="submit" name="checkAvailability" value="true" class="btn btn-outline-dark salon-outline-btn btn-lg w-100 mb-3">
                         Check Available Times
                     </button>
 
-                    <button type="submit" class="btn btn-dark btn-lg w-100">
+                    <button type="submit" class="btn btn-dark salon-primary-btn btn-lg w-100">
                         Book Appointment
                     </button>
                 </form>
