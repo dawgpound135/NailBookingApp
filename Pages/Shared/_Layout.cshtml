@@ -13,12 +13,16 @@
 }
 <body class="page-@pageName">
     <header class="site-header py-3 text-center border-bottom">
-    <div class="container">
-        <h1 class="site-logo mb-1">
-            <img class="site-logo-img" src="~/images/hottiebox-logo.png" alt="The Hottie Box" asp-append-version="true" />
-        </h1>
-    </div>
-</header>
+        <div class="container">
+            <a class="site-logo mb-2" asp-page="/Index" aria-label="The Hottie Box home">
+                <img class="site-logo-img" src="~/images/hottiebox-logo.png" alt="The Hottie Box" asp-append-version="true" />
+            </a>
+            <nav class="site-nav" aria-label="Primary navigation">
+                <a asp-page="/Index">Home</a>
+                <a asp-page="/Book">Book</a>
+            </nav>
+        </div>
+    </header>
     
     <main class="container py-4">
         @RenderBody()

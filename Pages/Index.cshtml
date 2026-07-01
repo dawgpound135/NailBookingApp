@@ -1,10 +1,52 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="home-hero">
+    <div class="home-hero-content">
+        <div class="salon-kicker mb-2">The Hottie Box appointments</div>
+        <h1 class="home-hero-title">The Hottie Box</h1>
+        <p class="home-hero-copy">
+            Book polished nail and makeup appointments with a simple, calm booking flow.
+        </p>
+        <div class="home-hero-actions">
+            <a class="btn btn-dark salon-primary-btn btn-lg" asp-page="/Book">Book Appointment</a>
+            <a class="btn btn-outline-dark salon-outline-btn btn-lg" href="#services">View Services</a>
+        </div>
+    </div>
+</section>
+
+<section id="services" class="home-section">
+    <div class="home-section-heading">
+        <div class="salon-kicker mb-2">Services</div>
+        <h2>Choose your appointment type</h2>
+    </div>
+
+    <div class="home-service-grid">
+        <article class="home-service-card">
+            <h3>Manicures</h3>
+            <p>Rubber base, Gel-X, infills, soak-offs, repairs, and nail art add-ons.</p>
+        </article>
+
+        <article class="home-service-card">
+            <h3>Pedicures</h3>
+            <p>Fresh pedicure services with soak-off options for a neat, finished look.</p>
+        </article>
+
+        <article class="home-service-card">
+            <h3>Makeup</h3>
+            <p>Soft glam, full glam, lash add-ons, and trial appointments.</p>
+        </article>
+    </div>
+</section>
+
+<section class="home-booking-strip">
+    <div>
+        <div class="salon-kicker mb-2">Ready when you are</div>
+        <h2 class="h3 mb-2">Check available times online</h2>
+        <p class="mb-0">Appointments open from one week in advance. Pick a service, choose a date, and select an available time.</p>
+    </div>
+    <a class="btn btn-dark salon-primary-btn btn-lg" asp-page="/Book">Start Booking</a>
+</section>
