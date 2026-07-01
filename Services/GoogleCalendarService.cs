@@ -9,11 +9,13 @@ namespace NailBookingApp.Services;
 public class GoogleCalendarService
 {
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private static readonly TimeSpan SouthAfricaOffset = TimeSpan.FromHours(2);
 
-    public GoogleCalendarService(IConfiguration configuration)
+    public GoogleCalendarService(IConfiguration configuration, IWebHostEnvironment environment)
     {
         _configuration = configuration;
+        _environment = environment;
     }
 
     private CalendarService CreateCalendarService()
@@ -22,7 +24,17 @@ public class GoogleCalendarService
 
         if (string.IsNullOrWhiteSpace(serviceAccountJson))
         {
-            throw new Exception("Google service account JSON is missing from environment variables.");
+            var localServiceAccountPath = Path.Combine(_environment.ContentRootPath, "hottiebox-nail-appointments-c8657048ac9e.json");
+
+            if (File.Exists(localServiceAccountPath))
+            {
+                serviceAccountJson = File.ReadAllText(localServiceAccountPath);
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(serviceAccountJson))
+        {
+            throw new Exception("Google service account JSON is missing. Set GOOGLE_SERVICE_ACCOUNT_JSON on the host, or keep the local service-account JSON file in the project folder for development.");
         }
 
         var credential = GoogleCredential
@@ -38,7 +50,7 @@ public class GoogleCalendarService
 
     public async Task<string> CreateBookingEventAsync(BookingRequest booking)
     {
-        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var calendarId = GetCalendarId();
 
         var service = CreateCalendarService();
 
@@ -86,7 +98,7 @@ public class GoogleCalendarService
 
     public async Task<bool> IsSlotAvailableAsync(BookingRequest booking)
     {
-        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var calendarId = GetCalendarId();
 
         var service = CreateCalendarService();
 
@@ -118,7 +130,7 @@ public class GoogleCalendarService
             "13:00", "14:00", "15:00", "16:00", "17:00"
         };
 
-        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+        var calendarId = GetCalendarId();
         var calendarService = CreateCalendarService();
         var serviceDuration = GetServiceDuration(service);
 
@@ -172,5 +184,17 @@ public class GoogleCalendarService
         }
 
         return eventStart.Value < slotEnd && eventEnd.Value > slotStart;
+    }
+
+    private string GetCalendarId()
+    {
+        var calendarId = _configuration["GoogleCalendar:CalendarId"];
+
+        if (string.IsNullOrWhiteSpace(calendarId))
+        {
+            throw new Exception("Google Calendar ID is missing. Set GoogleCalendar:CalendarId locally or GoogleCalendar__CalendarId on the host.");
+        }
+
+        return calendarId;
     }
 }

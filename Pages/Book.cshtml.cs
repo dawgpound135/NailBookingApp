@@ -10,6 +10,7 @@ public class BookModel : PageModel
 {
     private readonly GoogleCalendarService _calendarService;
     public List<string> AvailableTimeSlots { get; set; } = new();
+    public bool HasCheckedAvailability { get; set; }
     public DateTime MinimumBookingDate => DateTime.Today.AddDays(7);
 
     public BookModel(GoogleCalendarService calendarService)
@@ -60,16 +61,25 @@ public class BookModel : PageModel
 
     if (Request.Form.ContainsKey("checkAvailability"))
     {
+        HasCheckedAvailability = true;
+
         if (string.IsNullOrWhiteSpace(Booking.Service))
         {
             ErrorMessage = "Please select a service first.";
             return Page();
         }
 
-        AvailableTimeSlots = await _calendarService.GetAvailableTimeSlotsAsync(
-            Booking.AppointmentDate,
-            Booking.Service
-        );
+        try
+        {
+            AvailableTimeSlots = await _calendarService.GetAvailableTimeSlotsAsync(
+                Booking.AppointmentDate,
+                Booking.Service
+            );
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
 
         return Page();
     }

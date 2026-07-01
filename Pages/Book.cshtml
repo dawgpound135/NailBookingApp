@@ -212,9 +212,19 @@
                         }
                         else
                         {
-                            <div class="alert alert-info">
-                                Select a service and date, then check available times.
-                            </div>
+                            @if (Model.HasCheckedAvailability)
+                            {
+                                <div class="alert salon-empty-times-alert mb-0">
+                                    <div class="salon-empty-times-title">No available times for this date</div>
+                                    <div>Please choose another date and check again.</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">
+                                    Select a service and date, then check available times.
+                                </div>
+                            }
                         }
                     </div>
 
